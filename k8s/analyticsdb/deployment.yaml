@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analyticsdb
+  namespace: shop-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analyticsdb
+  template:
+    metadata:
+      labels:
+        app: analyticsdb
+    spec:
+      containers:
+        - name: analyticsdb
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: 'analytics_root_pass'
+            - name: MYSQL_DATABASE
+              value: 'analytics_db'
+            - name: MYSQL_USER
+              value: 'analytics_user'
+            - name: MYSQL_PASSWORD
+              value: 'analytics_pass'
+          volumeMounts:
+            - name: analytics-data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: analytics-data
+          persistentVolumeClaim:
+            claimName: analytics-data

@@ -1,0 +1,18 @@
+# Dockerfile for Analytics MySQL Database
+FROM mysql:8.0
+
+# Set environment variables
+ENV MYSQL_ROOT_PASSWORD=analytics_root_pass
+ENV MYSQL_DATABASE=analytics_db
+ENV MYSQL_USER=analytics_user
+ENV MYSQL_PASSWORD=analytics_pass
+
+# Copy initialization script
+COPY init-analytics-db.sql /docker-entrypoint-initdb.d/
+
+# Expose MySQL port
+EXPOSE 3306
+
+# MySQL will automatically run scripts in /docker-entrypoint-initdb.d/ on first startup
+
+CMD ["--default-authentication-plugin=mysql_native_password"]

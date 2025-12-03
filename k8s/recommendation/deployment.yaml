@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendation
+  namespace: shop-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recommendation
+  template:
+    metadata:
+      labels:
+        app: recommendation
+    spec:
+      containers:
+        - name: recommendation
+          image: gcr.io/dat515-478210/recommendation:v1
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DATABASE_URL
+              value: 'mysql+pymysql://dat515user:admin123@mysql:3306/DAT515'
+            - name: MYSQL_USER
+              value: 'root'
+            - name: MYSQL_PASSWORD
+              value: 'admin123'
+            - name: MYSQL_HOST
+              value: 'mysql'
+            - name: MYSQL_DB
+              value: 'DAT515'
+
+            - name: ANALYTICS_DB_URL
+              value: 'mysql+pymysql://analytics_user:analytics_pass@analyticsdb:3306/analytics_db'
+            - name: ANALYTICS_MYSQL_USER
+              value: 'analytics_user'
+            - name: ANALYTICS_MYSQL_PASSWORD
+              value: 'analytics_pass'
+            - name: ANALYTICS_MYSQL_HOST
+              value: 'analyticsdb'
+            - name: ANALYTICS_MYSQL_PORT
+              value: '3306'
+            - name: ANALYTICS_MYSQL_DB
+              value: 'analytics_db'
+          resources:
+            requests:
+              cpu: '100m'
+              memory: '256Mi'
+            limits:
+              cpu: '500m'
+              memory: '512Mi'
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 20
